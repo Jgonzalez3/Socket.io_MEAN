@@ -21,6 +21,7 @@ io.on('connection', function(socket){
     if(count == 10){
         count = 0;
     }
+    io.emit("joined", {msg:"Has Joined the Room"}, socket.id);
     console.log(socket.id)
     socket.on("newmessage", function(message, user){
         console.log("message",message);

@@ -46,6 +46,12 @@
                     $("#convoboard").show();
                 }
             });
+            socket.on("joined", function(data, userid){
+                let newuser = document.createElement("p");
+                newuser.innerText = `${userid} ${data.msg}`;
+                let adduser = document.getElementById("messages")
+                adduser.appendChild(newuser);
+            });
             function PromptName(){
                 user = prompt("Enter Your Name:");
                 if(user == "" || user == null){
