@@ -23,13 +23,6 @@
                 PromptName();
                 console.log(user);
                 if(user !== null){
-                    count = servercount;
-                    console.log(count)
-                    while(count<color.length){
-                        var usercolor = color[count];
-                        usercolorobj[userid] = usercolor;
-                        break;
-                    }
                     console.log(user);
                     console.log(messages);
                     for(var i = 0; i<messages.length; i++){
@@ -71,8 +64,15 @@
                 console.log(sender);
                 console.log(usercolorobj);
                 let newmessage = document.createElement("p");
+                console.log(count)
+                while(count<color.length){
+                    var usercolor = color[count];
+                    count++;
+                    usercolorobj[sender] = usercolor;
+                    break;
+                }
                 for(var key in usercolorobj){
-                    if(key == userid){
+                    if(key == user){
                         newmessage.style.color = usercolorobj[key];
                         break;
                     }
@@ -80,6 +80,12 @@
                 newmessage.innerText = `${sender}:  ${message}`;
                 let messagebox = document.getElementById("messages")
                 messagebox.appendChild(newmessage);
+            });
+            socket.on("userleft", function(data, userid){
+                let newuser = document.createElement("p");
+                newuser.innerText = `${userid} ${data.msg}`;
+                let adduser = document.getElementById("messages")
+                adduser.appendChild(newuser);
             });
         })
     </script>
