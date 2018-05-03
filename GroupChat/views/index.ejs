@@ -19,7 +19,7 @@
         $(document).ready(function(){
             $("#convoboard").hide();
             var socket = io();
-            socket.on('greeting', function(data, messages, servercount){
+            socket.on('greeting', function(data, messages, servercount, userid){
                 PromptName();
                 console.log(user);
                 if(user !== null){
@@ -27,7 +27,7 @@
                     console.log(count)
                     while(count<color.length){
                         var usercolor = color[count];
-                        usercolorobj[user] = usercolor;
+                        usercolorobj[userid] = usercolor;
                         break;
                     }
                     console.log(user);
@@ -60,13 +60,13 @@
                 socket.emit('newmessage', message, sender);
                 $("#message").val("");
             });
-            socket.on("clientmessage", function(message, sender){
+            socket.on("clientmessage", function(message, sender, userid){
                 console.log(message);
                 console.log(sender);
                 console.log(usercolorobj);
                 let newmessage = document.createElement("p");
                 for(var key in usercolorobj){
-                    if(key == sender){
+                    if(key == userid){
                         newmessage.style.color = usercolorobj[key];
                         break;
                     }
