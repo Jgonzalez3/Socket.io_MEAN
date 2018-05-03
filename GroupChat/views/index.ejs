@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Group Chat Room</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script type ="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script>
+        var user;
+        var usercolorobj = {};
+        var count = 0;
+        var color = ["darkred", "darkolivegreen", "blue", "purple", "darkgold", "black", "orange", "dodgerblue", "violet", "tomato", "magenta"];
+        $(document).ready(function(){
+            $("#convoboard").hide();
+            var socket = io();
+            socket.on('greeting', function(data, messages, servercount){
+                PromptName();
+                console.log(user);
+                if(user !== null){
+                    count = servercount;
+                    console.log(count)
+                    while(count<color.length){
+                        var usercolor = color[count];
+                        usercolorobj[user] = usercolor;
+                        break;
+                    }
+                    console.log(user);
+                    console.log(messages);
+                    for(var i = 0; i<messages.length; i++){
+                        console.log(messages[i]);
+                        let message = document.createElement("p");
+                        message.innerText = `${messages[i]}`;
+                        let adduser = document.getElementById("messages")
+                        adduser.appendChild(message);
+                    }
+                    let newuser = document.createElement("p");
+                    newuser.innerText = `${data.msg} - ${user}`;
+                    let adduser = document.getElementById("messages")
+                    adduser.appendChild(newuser);
+                    $("#convoboard").show();
+                }
+            });
+            function PromptName(){
+                user = prompt("Enter Your Name:");
+                if(user == "" || user == null){
+                    PromptName();
+                }
+            }
+            $("#addmessage").submit(function(e){
+                let message = $("#message").val();
+                console.log(message);
+                e.preventDefault();
+                let sender = user;
+                socket.emit('newmessage', message, sender);
+                $("#message").val("");
+            });
+            socket.on("clientmessage", function(message, sender){
+                console.log(message);
+                console.log(sender);
+                console.log(usercolorobj);
+                let newmessage = document.createElement("p");
+                for(var key in usercolorobj){
+                    if(key == sender){
+                        newmessage.style.color = usercolorobj[key];
+                        break;
+                    }
+                }
+                newmessage.innerText = `${sender}:  ${message}`;
+                let messagebox = document.getElementById("messages")
+                messagebox.appendChild(newmessage);
+            });
+        })
+    </script>
+</head>
+<body>
+    <div id="convoboard" class="container">
+        <div class="row">
+            <div class="col-md-10">
+                <h2><u>Conversation Board</u></h2>
+            </div>
+        </div>
+        <div class="row">
+            <div id="messages" class="col-md-10 border border-dark"></div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-10">
+                <form id="addmessage">
+                    <input class="form-control" id="message" placeholder="enter your message here"><br>
+                    <button class="btn btn-dark float-right" type="submit">Send</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
